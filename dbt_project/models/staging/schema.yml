@@ -1,0 +1,88 @@
+version: 2
+
+models:
+  - name: stg_match_results
+    description: >
+      Staged match results from HLTV /results scraper.
+      One row per series (bo1/bo3/bo5). Deduped by match_id,
+      types cast, event_tier and match_format normalised.
+
+    columns:
+      - name: match_id
+        description: "HLTV numeric match ID cast to VARCHAR"
+        tests:
+          - not_null
+          - unique
+
+      - name: team1_name
+        description: "Name of the first team (winner in HLTV listing order)"
+        tests:
+          - not_null
+
+      - name: team2_name
+        description: "Name of the second team"
+        tests:
+          - not_null
+
+      - name: match_format
+        description: "Series format: bo1, bo3, bo5, or null (walkover / unknown)"
+        tests:
+          - accepted_values:
+              values: ["bo1", "bo3", "bo5"]
+              # nulls are allowed — dbt accepted_values ignores them by default
+
+      - name: event_tier
+        description: "Normalised event tier: major, s-tier, or a-tier"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ["major", "s-tier", "a-tier"]
+
+      - name: match_date
+        description: "Match date (filled from scraped_at for featured block rows)"
+        tests:
+          - not_null
+
+      - name: match_winner
+        description: "Name of the winning team, null if draw or scores missing"
+
+      - name: scraped_at
+        description: "UTC timestamp of the scrape run that produced this row"
+        tests:
+          - not_null
+
+  - name: stg_player_stats
+    description: >
+      Staged per-player match statistics from HLTV match detail pages.
+      One row per (match_id, player_name). Deduped, types cast, kd_ratio added.
+
+    columns:
+      - name: match_id
+        description: "HLTV match ID (VARCHAR, FK to stg_match_results)"
+        tests:
+          - not_null
+
+      - name: player_name
+        description: "Player nickname"
+        tests:
+          - not_null
+
+      - name: team_name
+        description: "Team the player represented in this match"
+        tests:
+          - not_null
+
+      - name: rating
+        description: "HLTV Rating 2.0 / 3.0"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 5
+
+      - name: kd_ratio
+        description: "Kills divided by deaths; null if deaths = 0"
+
+      - name: scraped_at
+        tests:
+          - not_null

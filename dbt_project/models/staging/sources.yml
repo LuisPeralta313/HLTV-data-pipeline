@@ -1,0 +1,28 @@
+version: 2
+
+sources:
+  - name: raw_matches
+    description: "Parquet files scraped from HLTV /results, one file per scrape run"
+    meta:
+      # DuckDB reads these files at query time via read_parquet()
+      # Path is resolved relative to the DuckDB database file location (warehouse/)
+      parquet_glob: "../raw_layer/matches/*.parquet"
+    tables:
+      - name: match_results
+        description: "Raw match results — one row per series, directly from scraper"
+        columns:
+          - name: match_id
+            description: "Numeric HLTV match ID"
+          - name: match_date
+            description: "Date of the match (null for 'featured' block)"
+          - name: team1_name
+          - name: team2_name
+          - name: team1_score
+          - name: team2_score
+          - name: event_name
+          - name: event_tier
+            description: "Raw tier: Major / S-tier / A-tier / Other"
+          - name: match_format
+            description: "Raw format: bo1 / bo3 / bo5 / unknown"
+          - name: scraped_at
+            description: "ISO-8601 UTC timestamp of the scrape run"

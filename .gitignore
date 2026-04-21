@@ -1,0 +1,41 @@
+# Environments
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Secrets
+.env
+
+# Raw data (large binary files — no subir a git)
+raw_layer/
+
+# Warehouse local (binario DuckDB)
+warehouse/*.duckdb
+warehouse/*.duckdb.wal
+
+# Airflow home completo (contiene SQLite con credenciales y logs)
+orchestration/airflow_home/
+orchestration/logs/
+orchestration/airflow.db
+orchestration/airflow-webserver.pid
+
+# Logs del scraper
+logs/
+
+# Scripts de diagnóstico (no necesarios en producción)
+debug/
+
+# dbt
+dbt_project/target/
+dbt_project/dbt_packages/
+dbt_project/logs/
+dbt_project/.user.yml
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
